@@ -1,0 +1,39 @@
+{
+  "frozen_config": {
+    "data_path": "data\\cicids2017_cleaned.csv",
+    "row_limit": 250000,
+    "contamination": 0.36,
+    "ae_epochs": 20,
+    "seed": 42,
+    "ae_fixed_threshold": 0.005240097370565431,
+    "hybrid_fixed_threshold": 0.050350018691288925,
+    "weight_if": 0.2,
+    "weight_grid": [
+      0.2,
+      0.4,
+      0.6,
+      0.8
+    ]
+  },
+  "artifacts": {
+    "benchmark_all_path": "reports\\tables\\model_benchmark_all.csv",
+    "weight_sweep_path": "reports\\tables\\hybrid_weight_sweep.csv",
+    "summary_path": "reports\\final_summary.md"
+  },
+  "selected_thresholds": {
+    "autoencoder_threshold": 0.005240097370565431,
+    "hybrid_threshold": 0.050350018691288925
+  },
+  "recommended_weight_by_attack_f1": {
+    "weight_if": 0.2,
+    "weight_ae": 0.8,
+    "selected_threshold": 0.050350018691288925,
+    "accuracy": 0.511868,
+    "attack_precision": 0.032686913038175384,
+    "attack_recall": 0.011731103839966733,
+    "attack_f1": 0.017265677218808635,
+    "normal_recall": 0.7999987391170036,
+    "macro_f1": 0.3462784856294111,
+    "false_positive_rate": 0.20000126088299636
+  }
+}

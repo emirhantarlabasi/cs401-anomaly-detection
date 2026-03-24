@@ -1,0 +1,19 @@
+{
+  "data_path": "data/cicids2017_cleaned.csv",
+  "row_limit": 250000,
+  "contamination": 0.36,
+  "ae_epochs": 20,
+  "seed": 42,
+  "ae_fixed_threshold": 0.005240097370565431,
+  "hybrid_fixed_threshold": 0.050350018691288925,
+  "weight_if": 0.2,
+  "weight_grid": [0.2, 0.4, 0.6, 0.8],
+  "max_fpr": 0.35,
+  "run_mode": "official_final_frozen",
+  "outputs": {
+    "benchmark_all_path": "reports/tables/model_benchmark_all.csv",
+    "weight_sweep_path": "reports/tables/hybrid_weight_sweep.csv",
+    "summary_path": "reports/final_summary.md",
+    "lock_path": "reports/final_locked_params.json"
+  }
+}

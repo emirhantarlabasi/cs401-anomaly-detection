@@ -1,0 +1,14 @@
+{
+  "data_path": "data/cicids2017_cleaned.csv",
+  "row_limit": 250000,
+  "seed": 42,
+  "hbos_bins": 10,
+  "ae_epochs": 20,
+  "ae_batch_size": 512,
+  "ae_lr": 0.001,
+  "weight_grid": [0.2, 0.4, 0.6, 0.8],
+  "threshold_percentiles": [50, 60, 70, 80, 90, 95, 97, 99],
+  "min_recall": 0.6,
+  "max_fpr": 0.35,
+  "output_dir": "reports/tables"
+}

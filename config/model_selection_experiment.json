@@ -1,0 +1,22 @@
+{
+  "data_path": "data/cicids2017_cleaned.csv",
+  "row_limit": 250000,
+  "seed": 42,
+  "min_recall": 0.6,
+  "if_grid": {
+    "n_estimators": [100, 200, 300],
+    "contamination": [0.02, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3],
+    "max_samples": [256, 512]
+  },
+  "ae_grid": {
+    "hidden_dim": [64],
+    "latent_dim": [16, 32],
+    "epochs": [10, 20],
+    "batch_size": [512],
+    "lr": [0.001]
+  },
+  "ae_threshold_percentiles": [50.0, 60.0, 70.0, 80.0, 90.0, 95.0, 97.0, 99.0],
+  "hybrid_weight_grid": [0.2, 0.4, 0.6, 0.8],
+  "hybrid_threshold_percentiles": [50.0, 60.0, 70.0, 80.0, 90.0, 95.0, 97.0, 99.0],
+  "output_dir": "reports/tables"
+}

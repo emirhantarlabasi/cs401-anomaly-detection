@@ -1,35 +1,46 @@
-import pandas as pd
-from sklearn.ensemble import IsolationForest
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split
+from __future__ import annotations
+
+import argparse
 import os
+from pathlib import Path
 
-# Dosya yolları
-TRAIN_OPT_PATH = '../data/train_optimized.csv'
-TEST_OPT_PATH = '../data/test_optimized.csv'
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
 
-def test_mixed_model():
-    print("🚀 FİNAL TEST (KARMA VERİ İLE) BAŞLIYOR...")
+from evaluate import evaluate_binary
+
+
+TRAIN_OPT_PATH = Path("data/train_optimized.csv")
+TEST_OPT_PATH = Path("data/test_optimized.csv")
+
+
+def test_mixed_model(
+    train_opt_path: Path = TRAIN_OPT_PATH,
+    test_opt_path: Path = TEST_OPT_PATH,
+    contamination: float = 0.10,
+) -> None:
+    print("Final test (karma veri) basliyor...")
 
     # 1. Verileri Yükle
-    if not os.path.exists(TRAIN_OPT_PATH):
-        print("❌ Dosya bulunamadı.")
-        return
+    if not train_opt_path.exists() or not test_opt_path.exists():
+        raise FileNotFoundError("Optimize edilmis train/test dosyalari bulunamadi.")
 
-    print("⏳ Veriler yükleniyor...")
-    # Normal veriler (Eğitim seti)
-    df_normal = pd.read_csv(TRAIN_OPT_PATH)
-    # Saldırı verileri (Test seti)
-    df_attack = pd.read_csv(TEST_OPT_PATH)
+    print("Veriler yukleniyor...")
+    df_normal = pd.read_csv(train_opt_path)
+    df_attack = pd.read_csv(test_opt_path)
 
     # 2. Normal Veriyi İkiye Böl (Train / Test)
     # Normal verinin %80'ini eğitim, %20'sini test için ayıralım.
     # Böylece modelin hiç görmediği normal verilerle de test etmiş oluruz.
     X_train_normal, X_test_normal = train_test_split(df_normal, test_size=0.2, random_state=42)
 
-    print(f"📊 Eğitim Seti (Sadece Normal): {len(X_train_normal)} satır")
-    print(f"📊 Test Seti (Normal): {len(X_test_normal)} satır")
-    print(f"📊 Test Seti (Saldırı): {len(df_attack)} satır")
+    print(f"Egitim seti (sadece normal): {len(X_train_normal)} satir")
+    print(f"Test seti (normal): {len(X_test_normal)} satir")
+    print(f"Test seti (saldiri): {len(df_attack)} satir")
 
     # 3. Test Setini Oluştur (Normal + Saldırı Karışık)
     # Normallere etiket 0 verelim
@@ -46,8 +57,8 @@ def test_mixed_model():
     y_test_final = y_test_normal + y_test_attack
 
     # 4. Modeli Eğit (Sadece X_train_normal ile)
-    print("🌲 Isolation Forest eğitiliyor...")
-    clf = IsolationForest(n_estimators=200, contamination=0.10, random_state=42, n_jobs=-1)
+    print("Isolation Forest egitiliyor...")
+    clf = IsolationForest(n_estimators=200, contamination=contamination, random_state=42, n_jobs=-1)
     
     # Eğitim setinde 'Attack Type' kalmışsa temizle
     if 'Attack Type' in X_train_normal.columns:
@@ -56,7 +67,7 @@ def test_mixed_model():
     clf.fit(X_train_normal)
 
     # 5. Tahmin Yap
-    print("🔮 Tahmin yapılıyor...")
+    print("Tahmin yapiliyor...")
     y_pred_raw = clf.predict(X_test_final)
     
     # Isolation Forest çıktılarını çevir (1 -> 0, -1 -> 1)
@@ -64,14 +75,110 @@ def test_mixed_model():
 
     # 6. Sonuçlar
     print("\n" + "="*50)
-    print("🏆 GERÇEK PERFORMANS SONUÇLARI")
+    print("GERCEK PERFORMANS SONUCLARI")
     print("="*50)
+
+    cm, report_text = evaluate_binary(pd.Series(y_test_final), np.array(y_pred))
     print("Confusion Matrix:")
-    # [[ TN, FP ]
-    #  [ FN, TP ]]
-    print(confusion_matrix(y_test_final, y_pred))
+    print(cm)
     print("\nClassification Report:")
-    print(classification_report(y_test_final, y_pred, digits=4))
+    print(report_text)
+
+    # 7. Sonuçları ve görselleri kaydet
+    print("\nSonuclar ve gorseller kaydediliyor...")
+    os.makedirs("reports/figures", exist_ok=True)
+    os.makedirs("reports/tables", exist_ok=True)
+
+    # 7.1. Karma veri sonuç tablosu (best/worst case analizi için)
+    scores = clf.decision_function(X_test_final)
+    results_df = X_test_final.copy()
+    results_df["true_label"] = y_test_final
+    results_df["pred_label"] = y_pred
+    results_df["anomaly_score"] = scores
+    results_path = os.path.join("reports", "tables", "if_mixed_results.csv")
+    results_df.to_csv(results_path, index_label="index")
+
+    # 7.2. Confusion matrix görseli
+    plt.figure(figsize=(5, 4))
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        xticklabels=["Pred Normal", "Pred Attack"],
+        yticklabels=["True Normal", "True Attack"],
+    )
+    plt.title("Isolation Forest – Confusion Matrix (Mixed Test Set)")
+    plt.tight_layout()
+    cm_path = os.path.join("reports", "figures", "if_confusion_matrix.png")
+    plt.savefig(cm_path, dpi=150)
+    plt.close()
+
+    # 7.3. Zaman içinde anomaly score (index ~ zaman)
+    plt.figure(figsize=(10, 4))
+    idx = np.arange(len(results_df))
+    plt.plot(idx, results_df["anomaly_score"], label="Anomaly score", linewidth=0.8)
+
+    # Tahmin edilen anomalileri işaretle (best / worst case görseli için)
+    mask_anom = results_df["pred_label"] == 1
+    x_anom = idx[mask_anom.values]
+    y_anom = results_df.loc[mask_anom, "anomaly_score"].values
+    plt.scatter(
+        x_anom,
+        y_anom,
+        color="red",
+        s=6,
+        alpha=0.6,
+        label="Predicted anomalies",
+    )
+
+    plt.xlabel("Flow index (proxy for time)")
+    plt.ylabel("Isolation Forest anomaly score")
+    plt.title("Anomaly scores over mixed test set")
+    plt.legend(loc="best")
+    plt.tight_layout()
+    scores_path = os.path.join("reports", "figures", "if_anomaly_scores_over_time.png")
+    plt.savefig(scores_path, dpi=150)
+    plt.close()
+
+    # 7.4. Zaman pencerelerine göre alarm yoğunluğu (ör: her 500 flow)
+    window_size = 500
+    window_ids = idx // window_size
+    window_df = (
+        pd.DataFrame(
+            {
+                "window": window_ids,
+                "is_anomaly": results_df["pred_label"],
+            }
+        )
+        .groupby("window")
+        .agg(anomaly_rate=("is_anomaly", "mean"), count=("is_anomaly", "size"))
+        .reset_index()
+    )
+
+    plt.figure(figsize=(10, 4))
+    plt.bar(window_df["window"], window_df["anomaly_rate"], width=0.9)
+    plt.xlabel(f"Window index (size={window_size} flows)")
+    plt.ylabel("Predicted anomaly rate")
+    plt.title("Predicted anomaly rate by window")
+    plt.tight_layout()
+    rate_path = os.path.join("reports", "figures", "if_anomaly_rate_by_window.png")
+    plt.savefig(rate_path, dpi=150)
+    plt.close()
+
+    print(f"Tablo kaydedildi: {results_path}")
+    print(f"Confusion matrix gorseli: {cm_path}")
+    print(f"Anomaly score zaman grafigi: {scores_path}")
+    print(f"Alarm yogunlugu grafigi: {rate_path}")
 
 if __name__ == "__main__":
-    test_mixed_model()
+    parser = argparse.ArgumentParser(description="Evaluate optimized IF model on mixed test set")
+    parser.add_argument("--train-path", type=Path, default=TRAIN_OPT_PATH)
+    parser.add_argument("--test-path", type=Path, default=TEST_OPT_PATH)
+    parser.add_argument("--contamination", type=float, default=0.10)
+    args = parser.parse_args()
+    test_mixed_model(
+        train_opt_path=args.train_path,
+        test_opt_path=args.test_path,
+        contamination=args.contamination,
+    )

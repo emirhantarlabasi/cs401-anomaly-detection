@@ -1,0 +1,19 @@
+{
+  "data_path": "data/cicids2017_cleaned.csv",
+  "row_limit": 250000,
+  "contamination": 0.36,
+  "ae_epochs": 20,
+  "seed": null,
+  "ae_fixed_threshold": null,
+  "hybrid_fixed_threshold": null,
+  "weight_if": 0.8,
+  "weight_grid": [0.2, 0.4, 0.6, 0.8],
+  "max_fpr": 0.5,
+  "run_mode": "experiment",
+  "outputs": {
+    "benchmark_all_path": "reports/tables/model_benchmark_all.csv",
+    "weight_sweep_path": "reports/tables/hybrid_weight_sweep.csv",
+    "summary_path": "reports/experiment_summary.md",
+    "lock_path": "reports/experiment_locked_params.json"
+  }
+}

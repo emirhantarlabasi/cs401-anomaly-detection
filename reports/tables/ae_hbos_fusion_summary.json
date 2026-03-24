@@ -1,0 +1,55 @@
+{
+  "best_config": {
+    "weight_hbos": 0.4,
+    "weight_ae": 0.6,
+    "threshold_percentile": 97.0,
+    "threshold_value": 0.11481709335978281,
+    "accuracy": 0.976128348877464,
+    "attack_precision": 0.9796927655477263,
+    "attack_recall": 0.9798643029109214,
+    "attack_f1": 0.9797785267212326,
+    "normal_recall": 0.9707476989030387,
+    "macro_f1": 0.9753243201071484,
+    "false_positive_rate": 0.02925230109696129
+  },
+  "test_metrics": {
+    "accuracy": 0.975934896337919,
+    "attack_precision": 0.9792878701719084,
+    "attack_recall": 0.9799522881968002,
+    "attack_f1": 0.9796199665255488,
+    "normal_recall": 0.9701487832555794,
+    "macro_f1": 0.9751214927949188,
+    "false_positive_rate": 0.02985121674442063
+  },
+  "settings": {
+    "data_path": "data\\cicids2017_cleaned.csv",
+    "row_limit": 250000,
+    "seed": 42,
+    "hbos_bins": 10,
+    "ae_epochs": 20,
+    "ae_batch_size": 512,
+    "ae_lr": 0.001,
+    "min_recall": 0.6,
+    "max_fpr": 0.35,
+    "weight_grid": [
+      0.2,
+      0.4,
+      0.6,
+      0.8
+    ],
+    "threshold_percentiles": [
+      50.0,
+      60.0,
+      70.0,
+      80.0,
+      90.0,
+      95.0,
+      97.0,
+      99.0
+    ]
+  },
+  "artifacts": {
+    "candidates": "reports\\tables\\ae_hbos_fusion_candidates.csv",
+    "results": "reports\\tables\\ae_hbos_fusion_results.csv"
+  }
+}

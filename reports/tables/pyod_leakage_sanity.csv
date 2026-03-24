@@ -1,0 +1,7 @@
+sample_size,split_mode,train_only_normal,index_overlap_count,threshold_selection_scope,leakage_check_pass
+100000,random,True,0,validation_only,True
+100000,time,True,0,validation_only,True
+250000,random,True,0,validation_only,True
+250000,time,True,0,validation_only,True
+400000,random,True,0,validation_only,True
+400000,time,True,0,validation_only,True

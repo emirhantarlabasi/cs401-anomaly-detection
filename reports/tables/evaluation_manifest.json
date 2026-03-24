@@ -1,0 +1,16 @@
+{
+  "data_path": "data\\cicids2017_cleaned.csv",
+  "row_limit": 250000,
+  "label_mapping": {
+    "normal": 0,
+    "attack": 1
+  },
+  "train_policy": "train on normal-only subset",
+  "test_policy": "evaluate on full mixed dataset",
+  "seed": 42,
+  "contamination": 0.36,
+  "weight_if": 0.8,
+  "ae_fixed_threshold": null,
+  "hybrid_fixed_threshold": null,
+  "max_fpr": 0.5
+}
