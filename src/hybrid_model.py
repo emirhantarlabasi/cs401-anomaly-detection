@@ -172,6 +172,7 @@ def run_hybrid(
         results_df["if_score"] = test_if_scaled
         results_df["ae_score"] = test_ae_scaled
         results_df["anomaly_score"] = test_hybrid
+        results_df["attack_type"] = df.loc[X_test.index, "Attack Type"]
         results_df.to_csv(results_output_path, index_label="index")
         print(f"Hybrid results saved to {results_output_path}")
 
