@@ -49,12 +49,16 @@ def test_mixed_model(
     # Saldırılara etiket 1 verelim
     y_test_attack = [1] * len(df_attack)
     
-    # Saldırı verisinden 'Attack Type' sütununu atalım (Sayısal olması için)
+    # Saldırı isimlerini sakla, sonra sütunu düşür
+    attack_types_list = df_attack["Attack Type"].tolist() if "Attack Type" in df_attack.columns else ["Unknown Attack"] * len(df_attack)
     X_test_attack = df_attack.drop(columns=['Attack Type'], errors='ignore')
 
     # Hepsini birleştirelim
     X_test_final = pd.concat([X_test_normal, X_test_attack])
     y_test_final = y_test_normal + y_test_attack
+    
+    # Normal ve Saldırı tiplerini birleştir
+    combined_attack_types = ["Normal Traffic"] * len(X_test_normal) + attack_types_list
 
     # 4. Modeli Eğit (Sadece X_train_normal ile)
     print("Isolation Forest egitiliyor...")
