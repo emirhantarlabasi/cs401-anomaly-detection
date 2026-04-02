@@ -27,6 +27,7 @@ def parse_args() -> argparse.Namespace:
             "pyod-benchmark",
             "pyod-stability-check",
             "ae-hbos-fusion",
+            "attack-analysis",
         ],
         default="baseline",
         help="Pipeline to run",
