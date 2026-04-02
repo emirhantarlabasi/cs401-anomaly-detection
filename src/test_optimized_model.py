@@ -99,6 +99,7 @@ def test_mixed_model(
     results_df["true_label"] = y_test_final
     results_df["pred_label"] = y_pred
     results_df["anomaly_score"] = scores
+    results_df["attack_type"] = combined_attack_types
     results_path = os.path.join("reports", "tables", "if_mixed_results.csv")
     results_df.to_csv(results_path, index_label="index")
 
