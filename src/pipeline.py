@@ -113,6 +113,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--config-path", type=Path, default=Path("config/experiment_config.json"))
+    parser.add_argument(
+        "--results-csv", 
+        type=Path, 
+        default=Path("reports/tables/if_mixed_results.csv"),
+        help="Target CSV file for attack analysis pipeline"
+    )
     return parser.parse_args()
 
 
@@ -265,6 +271,14 @@ def main() -> None:
         from ae_hbos_fusion import run_fusion
 
         run_fusion(config_path=args.config_path)
+
+    elif args.pipeline == "attack-analysis":
+        from attack_type_analysis import analyze_attack_types
+        
+        analyze_attack_types(
+            results_csv=args.results_csv,
+            output_dir=Path("reports/figures")
+        )
 
 
 if __name__ == "__main__":
