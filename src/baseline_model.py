@@ -105,6 +105,7 @@ def run_baseline(
         results_df["true_label"] = y_test.to_numpy()
         results_df["pred_label"] = y_pred
         results_df["anomaly_score"] = anomaly_score
+        results_df["attack_type"] = df.loc[X_test.index, "Attack Type"]
         results_df.to_csv(results_output_path, index_label="index")
         print(f"Baseline results saved to {results_output_path}")
 
